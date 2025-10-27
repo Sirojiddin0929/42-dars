@@ -1,14 +1,11 @@
-import { model,Schema } from "mongoose";
+import mongoose from "mongoose";
 
+const addressSchema = new mongoose.Schema({
+  name: { type: String },
+  customerId: { type: mongoose.Schema.Types.ObjectId, ref: "Customer", required: true },
+  address: { type: String, required: true },
+  location: { type: String },
+  district: { type:mongoose.Schema.Types.ObjectId, ref: "District", required: true },
+});
 
-const addressSchema=new Schema({
-    name:{type:String,required:true},
-    customerId:{type:Schema.Types.ObjectId,ref:"customer",required:true},
-    address:{type:String,required:true},
-    location:{type:String,required:true},
-    districtId:{type:Schema.Types.ObjectId,ref:"region",required:true}
-
-})
-
-const AddressModel=model("address",addressSchema)
-export default AddressModel
+export const Address=mongoose.model("Address",addressSchema)
