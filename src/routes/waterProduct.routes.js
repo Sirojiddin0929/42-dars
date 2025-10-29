@@ -1,6 +1,6 @@
 import express from "express";
 import { authGuard } from "../middleware/authGuard.js";
-import { checkRole } from "../middleware/roleGuard.js";
+import { ownershipOrRole } from "../middleware/roleGuard.js";
 
 import {
   createWaterProduct,
@@ -12,10 +12,10 @@ import {
 
 const router = express.Router();
 
-router.post("/",authGuard,checkRole("admin"), createWaterProduct);
+router.post("/",authGuard,ownershipOrRole("admin"), createWaterProduct);
 router.get("/", authGuard,getWaterProducts);
 router.get("/:id",authGuard, getWaterProductById);
-router.put("/:id",authGuard,checkRole("admin"), updateWaterProduct);
-router.delete("/:id", authGuard,checkRole("admin"),deleteWaterProduct);
+router.put("/:id",authGuard,ownershipOrRole("admin"), updateWaterProduct);
+router.delete("/:id", authGuard,ownershipOrRole("admin"),deleteWaterProduct);
 
 export default router;

@@ -1,6 +1,6 @@
 import express from "express";
 import { authGuard } from "../middleware/authGuard.js";
-import { checkRole } from "../middleware/roleGuard.js";
+import { ownershipOrRole } from "../middleware/roleGuard.js";
 import {
   createCustomer,
   getCustomers,
@@ -12,10 +12,10 @@ import { customerschema,customerschemaUpdate } from "../validation/customer.vali
 
 const router = express.Router();
 
-router.post("/",authGuard,checkRole("admin"), customerschema,createCustomer);
-router.get("/",authGuard,checkRole("admin"), getCustomers);
+router.post("/",authGuard,ownershipOrRole("admin"), customerschema,createCustomer);
+router.get("/",authGuard,ownershipOrRole("admin"), getCustomers);
 router.get("/:id", authGuard,getCustomerById);
 router.put("/:id", authGuard,customerschemaUpdate,updateCustomer);
-router.delete("/:id", authGuard, checkRole("admin"),deleteCustomer);
+router.delete("/:id", authGuard, ownershipOrRole("admin"),deleteCustomer);
 
 export default router;

@@ -1,6 +1,6 @@
 import express from "express";
 import { authGuard } from "../middleware/authGuard.js";
-import { checkRole } from "../middleware/roleGuard.js";
+import { ownershipOrRole } from "../middleware/roleGuard.js";
 import {
   createPayment,
   getPayments,
@@ -11,10 +11,10 @@ import {
 
 const router = express.Router();
 
-router.post("/",authGuard,checkRole("admin","Customer"),createPayment);
-router.get("/",authGuard,checkRole("admin","Customer") ,getPayments);
-router.get("/:id",authGuard,checkRole("admin","Customer"), getPaymentById);
-router.put("/:id", authGuard,checkRole("admin"), updatePayment);
-router.delete("/:id", authGuard,checkRole("admin"),deletePayment);
+router.post("/",authGuard,ownershipOrRole("admin","Customer"),createPayment);
+router.get("/",authGuard,ownershipOrRole("admin","Customer") ,getPayments);
+router.get("/:id",authGuard,ownershipOrRole("admin","Customer"), getPaymentById);
+router.put("/:id", authGuard,ownershipOrRole("admin"), updatePayment);
+router.delete("/:id", authGuard,ownershipOrRole("admin"),deletePayment);
 
 export default router;

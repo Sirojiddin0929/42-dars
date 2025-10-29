@@ -1,6 +1,6 @@
 import express from "express";
 import { authGuard } from "../middleware/authGuard.js";
-import { checkRole } from "../middleware/roleGuard.js";
+import { ownershipOrRole } from "../middleware/roleGuard.js";
 import {
   createOrderItem,
   getOrderItems,
@@ -11,10 +11,10 @@ import {
 
 const router = express.Router();
 
-router.post("/",authGuard,checkRole("admin","Customer"), createOrderItem);
+router.post("/",authGuard,ownershipOrRole("admin","Customer"), createOrderItem);
 router.get("/",authGuard, getOrderItems);
 router.get("/:id",authGuard, getOrderItemById);
-router.put("/:id", authGuard,checkRole("admin") ,updateOrderItem);
-router.delete("/:id",authGuard,checkRole("admin") ,deleteOrderItem);
+router.put("/:id", authGuard,ownershipOrRole("admin") ,updateOrderItem);
+router.delete("/:id",authGuard,ownershipOrRole("admin") ,deleteOrderItem);
 
 export default router;

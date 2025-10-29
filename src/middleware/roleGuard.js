@@ -1,15 +1,27 @@
-export const checkRole = (...allowedRoles) => {
+export const ownershipOrRole = (...allowedRoles) => {
   return (req, res, next) => {
     try {
-      const userRole = req.user.role; 
+      const userId = req.user?.id;
+      const paramId = req.params.id;
 
-      if (!allowedRoles.includes(userRole)) {
-        return res.status(403).json({ message: "Sizda bu amalni bajarish huquqi yoq" });
+      
+      if (allowedRoles.includes(req.user.role)) {
+        return next();
       }
 
-      next();
+     
+      if (paramId && userId && paramId === userId) {
+        return next();
+      }
+
+      return res.status(403).json({
+        message: "Access denied: Siz faqat o'zingizning ma'lumotlaringizga kirishingiz mumkin"
+      });
     } catch (error) {
-      return res.status(500).json({ message: "Rolni tekshirishda xatolik", error: error.message });
+      return res.status(500).json({
+        message: "Egalikni tekshirishda xatolik",
+        error: error.message
+      });
     }
   };
 };
