@@ -9,7 +9,7 @@ export const validate = (schema) => {
         errors: messages,
       });
     }
-    req.body = value; 
+    req.validatedData = value; 
     next();
   };
 };

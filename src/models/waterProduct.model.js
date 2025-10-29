@@ -4,7 +4,7 @@ const waterProductSchema = new mongoose.Schema({
   name: { type: String, required: true },
   volume_liters: { type: Number, required: true },
   price: { type: Number, required: true },
-});
+},{timestamps:true});
 
 export const waterProduct=mongoose.model("WaterProduct", waterProductSchema);
 

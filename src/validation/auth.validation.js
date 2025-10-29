@@ -3,7 +3,7 @@ import Joi from "joi";
 export const registerSchema = Joi.object({
   name: Joi.string().min(3).max(50).required(),
   phone: Joi.string().pattern(/^[0-9]{9,15}$/).required(),
-  password: Joi.string().min(8).max(20).required(),
+  password: Joi.string().min(8).max(20).pattern(new RegExp("(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])")).required(),
   role: Joi.string().valid("admin", "Customer", "DeliveryStaff").default("Customer")
 }).options({ stripUnknown: true }); 
 
