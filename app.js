@@ -1,7 +1,7 @@
 import express from "express"
 import dotenv from "dotenv"
 import cors from "cors"
-import { connectDB } from "./src/config/db.js"
+import { connectDB } from "./src/config/index.js"
 import  authRoutes from "./src/routes/auth.routes.js"
 import { errorHandler } from "./src/middleware/errorHandler.js"
 import customerRoutes from "./src/routes/customer.routes.js";
@@ -32,3 +32,4 @@ app.use("/api/products", waterProductRoutes);
 app.use(errorHandler)
 const PORT=process.env.PORT || 3000
 app.listen(PORT,()=>console.log(`Server running on PORT ${PORT}`))
+

@@ -2,8 +2,9 @@ import { Payment } from "../models/payment.model.js";
 
 export const createPayment = async (req, res, next) => {
   try {
-    const payment = await Payment.create(req.body);
-    res.status(201).json({ message: "Payment created", payment });
+    const body=req.validatedData
+    const payment = await Payment.create(body);
+    return res.status(201).json({ message: "Payment created", payment });
   } catch (err) {
     next(err);
   }
@@ -11,10 +12,14 @@ export const createPayment = async (req, res, next) => {
 
 export const getPayments = async (req, res, next) => {
   try {
-    const payments = await Payment.find()
-      .populate("order", "status order_date")
-      .sort({ payment_date: -1 });
-    res.json(payments);
+    const page=parseInt(req.query.page) || 1
+    const limit = parseInt(req.query.limit) || 10
+    const search= req.query.search || ''
+    const offset=(page-1)*limit
+    const areas=Object.keys(Payment.schema.paths).filter((i)=> !['_id','__v','createdAt','updatedAt'].includes(i))
+    const query=search?{$or:areas.map((i)=>({[i]:{$regex:search,$options:'i'}}))}:{}
+    const [data,total]= await Promise.all([Payment.find(query).skip(offset).limit(limit).sort({createdAt:-1}),Payment.countDocuments(query)])
+    return res.status(200).json({message:"OK",data,total,page,limit})
   } catch (err) {
     next(err);
   }
@@ -22,10 +27,10 @@ export const getPayments = async (req, res, next) => {
 
 export const getPaymentById = async (req, res, next) => {
   try {
-    const payment = await Payment.findById(req.params.id)
-      .populate("order", "status order_date");
+    const {id}=req.params
+    const payment = await Payment.findById(id)
     if (!payment) return res.status(404).json({ message: "Payment not found" });
-    res.json(payment);
+    return res.json(payment);
   } catch (err) {
     next(err);
   }
@@ -33,9 +38,11 @@ export const getPaymentById = async (req, res, next) => {
 
 export const updatePayment = async (req, res, next) => {
   try {
-    const payment = await Payment.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const {id}=req.params
+    const body = req.validatedData
+    const payment = await Payment.findByIdAndUpdate(id,body, { new: true });
     if (!payment) return res.status(404).json({ message: "Payment not found" });
-    res.json({ message: "Payment updated", payment });
+    return res.json({ message: "Payment updated", payment });
   } catch (err) {
     next(err);
   }
@@ -43,9 +50,10 @@ export const updatePayment = async (req, res, next) => {
 
 export const deletePayment = async (req, res, next) => {
   try {
-    const payment = await Payment.findByIdAndDelete(req.params.id);
+    const {id}=req.params
+    const payment = await Payment.findByIdAndDelete(id);
     if (!payment) return res.status(404).json({ message: "Payment not found" });
-    res.json({ message: "Payment deleted" });
+    return res.json({ message: "Payment deleted",payment });
   } catch (err) {
     next(err);
   }

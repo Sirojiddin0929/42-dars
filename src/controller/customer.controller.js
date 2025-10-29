@@ -2,14 +2,9 @@ import { Customer } from "../models/customer.model.js";
 
 export const createCustomer = async (req, res, next) => {
   try {
-    const {phone}=req.body
-    if(req.user.role !=="admin"){
-      return res.status(403).json({message:"Only Admin can add a new customer"})
-    }
-    const existing=await Customer.findOne({phone})
-    if(existing) return res.status(400).json({message:"Such Customer is already exist"})
-    const customer = await Customer.create(req.body);
-    res.status(201).json({ message: "Customer created", customer });
+    const body=req.validatedData
+    const data = await Customer.create(body)
+    return res.status(201).json({message:`Customer is created OK`,data})
   } catch (err) {
     next(err);
   }
@@ -17,11 +12,14 @@ export const createCustomer = async (req, res, next) => {
 
 export const getCustomers = async (req, res, next) => {
   try {
-    if(req.user.role !=="admin"){
-        return res.status(403).json("You are not allowed for this")
-    }
-    const customers = await Customer.find();
-    res.json(customers);
+    const page=parseInt(req.query.page) || 1
+    const limit =parseInt(req.query.limit) || 10
+    const search= req.query.search || ''
+    const offset=(page-1)*limit
+    const areas=Object.keys(Customer.schema.paths).filter((i)=> !['_id','_v','createdAt','updateAt'].includes(i))
+    const query=search?{$or: areas.map((i)=>({[i]:{$regex: search, $options:'i'}}))}:{}
+    const [data,total]= await Promise.all([Customer.find(query).skip(offset).limit(limit).sort({createdAt:-1}),Customer.countDocuments(query)])
+    return res.status(200).json({message:`OK`,data,total,page,limit})
   } catch (err) {
     next(err);
   }
@@ -30,12 +28,13 @@ export const getCustomers = async (req, res, next) => {
 export const getCustomerById = async (req, res, next) => {
   try {
     const {id}=req.params
-    if(req.user.role !=="admin" && req.user.id !==id){
-      return res.status(403).json({message:"You can only see your own profil"})
+    const data = await Customer.findOne(id)
+    if(!data){
+       return res.status(404).json({message:`Customer is not found with such Id`})
     }
-    const customer = await Customer.findById(id);
-    if (!customer) return res.status(404).json({ message: "Customer not found" });
-    res.json(customer);
+    return res.status(200).json({message: "Customer is found OK",data})
+
+    
   } catch (err) {
     next(err);
   }
@@ -44,12 +43,12 @@ export const getCustomerById = async (req, res, next) => {
 export const updateCustomer = async (req, res, next) => {
   try {
     const {id}=req.params
-    if(req.user.role !== "admin" && req.user.id !==id){
-       return res.status(403).json({message:"You  are able to update only your own profil"})
+    const body=req.validatedData
+    const data = await Customer.findByIdAndUpdate(id,body,{new:true})
+    if(!data){
+      return res.status(404).json({message:'Customer is not found'})
     }
-    const customer = await Customer.findByIdAndUpdate(id, req.body, { new: true });
-    if (!customer) return res.status(404).json({ message: "Customer not found" });
-    res.json({ message: "Customer updated", customer });
+    return res.status(200).json({message:'Update is done ',data})
   } catch (err) {
     next(err);
   }
@@ -57,13 +56,10 @@ export const updateCustomer = async (req, res, next) => {
 
 export const deleteCustomer = async (req, res, next) => {
   try {
-    if(req.user.role !== "admin"){
-       return res.status(403).json({message: "Admin can delete customers but not customer"})
-    }
     const {id}=req.params
     const customer = await Customer.findByIdAndDelete(id);
-    if (!customer) return res.status(404).json({ message: "Customer not found" });
-    res.json({ message: "Customer deleted" });
+    if (!customer) return res.status(404).json({ message: "Customer is  not found" });
+    res.status(200).json({ message: "Customer deleted",customer });
   } catch (err) {
     next(err);
   }
