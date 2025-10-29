@@ -1,6 +1,6 @@
 import express from "express";
 import { authGuard } from "../middleware/authGuard.js";
-import { checkRole } from "../middleware/roleGuard.js";
+import { ownershipOrRole } from "../middleware/roleGuard.js";
 import {
   createDeliveryStaff,
   getDeliveryStaff,
@@ -11,10 +11,10 @@ import {
 
 const router = express.Router();
 
-router.post("/",authGuard,checkRole("admin") ,createDeliveryStaff);
-router.get("/",authGuard,checkRole("admin"),getDeliveryStaff);
-router.get("/:id",authGuard,checkRole("admin","DeliveryStaff"),getDeliveryStaffById);
-router.put("/:id", authGuard,checkRole("admin","DeliveryStaff"),updateDeliveryStaff);
+router.post("/",authGuard,ownershipOrRole("admin") ,createDeliveryStaff);
+router.get("/",authGuard,ownershipOrRole("admin"),getDeliveryStaff);
+router.get("/:id",authGuard,ownershipOrRole("admin","DeliveryStaff"),getDeliveryStaffById);
+router.put("/:id", authGuard,ownershipOrRole("admin","DeliveryStaff"),updateDeliveryStaff);
 router.delete("/:id", deleteDeliveryStaff);
 
 export default router;

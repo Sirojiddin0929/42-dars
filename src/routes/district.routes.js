@@ -1,6 +1,6 @@
 import express from "express";
 import { authGuard } from "../middleware/authGuard.js";
-import { checkRole } from "../middleware/roleGuard.js";
+import { ownershipOrRole } from "../middleware/roleGuard.js";
 import {
   createDistrict,
   getDistricts,
@@ -11,10 +11,10 @@ import {
 
 const router = express.Router();
 
-router.post("/", authGuard,checkRole("admin"),createDistrict);
-router.get("/", authGuard,checkRole("admin","Customer"), getDistricts);
-router.get("/:id", authGuard,checkRole("admin","Customer"),getDistrictById);
-router.put("/:id", authGuard,checkRole("admin"),updateDistrict);
-router.delete("/:id", authGuard,checkRole("admin"),deleteDistrict);
+router.post("/", authGuard,ownershipOrRole("admin"),createDistrict);
+router.get("/", authGuard,ownershipOrRole("admin","Customer"), getDistricts);
+router.get("/:id", authGuard,ownershipOrRole("admin","Customer"),getDistrictById);
+router.put("/:id", authGuard,ownershipOrRole("admin"),updateDistrict);
+router.delete("/:id", authGuard,ownershipOrRole("admin"),deleteDistrict);
 
 export default router;
