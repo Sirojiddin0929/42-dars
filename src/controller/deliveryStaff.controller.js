@@ -28,7 +28,7 @@ export const getDeliveryStaff = async (req, res, next) => {
 export const getDeliveryStaffById = async (req, res, next) => {
   try {
     const {id}=req.params
-    const staff = await DeliveryStaff.findById(id)
+    const staff = await DeliveryStaff.findById({ _id: id })
     if (!staff) return res.status(404).json({ message: "DeliveryStaff is not found" });
     return res.status(200).json(staff);
   }catch(err){

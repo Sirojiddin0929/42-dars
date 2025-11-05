@@ -8,13 +8,15 @@ import {
   updatePayment,
   deletePayment
 } from "../controller/payment.controller.js";
-
+import { validate } from "../middleware/validate.middleware.js";
+import { paymentSchema,paymentSchemaUpdate } from "../validation/payments.validation.js";
 const router = express.Router();
 
-router.post("/",authGuard,ownershipOrRole("admin","Customer"),createPayment);
+
+router.post("/",authGuard,ownershipOrRole("admin","Customer"),validate(paymentSchema),createPayment);
 router.get("/",authGuard,ownershipOrRole("admin","Customer") ,getPayments);
 router.get("/:id",authGuard,ownershipOrRole("admin","Customer"), getPaymentById);
-router.put("/:id", authGuard,ownershipOrRole("admin"), updatePayment);
-router.delete("/:id", authGuard,ownershipOrRole("admin"),deletePayment);
+router.put("/:id", authGuard,ownershipOrRole("admin","Customer"),validate(paymentSchemaUpdate), updatePayment);
+router.delete("/:id", authGuard,ownershipOrRole("admin","Customer"),deletePayment);
 
-export default router;
+export {router as paymentRouter}

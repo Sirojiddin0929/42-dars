@@ -8,13 +8,15 @@ import {
   updateOrderItem,
   deleteOrderItem
 } from "../controller/orderItem.controller.js";
+import { validate } from "../middleware/validate.middleware.js";
+import { order_itemsSchema,order_itemsSchemaUpdate } from "../validation/orderItems.validation.js";
 
 const router = express.Router();
 
-router.post("/",authGuard,ownershipOrRole("admin","Customer"), createOrderItem);
+router.post("/",authGuard,ownershipOrRole("admin","Customer"),validate(order_itemsSchema), createOrderItem);
 router.get("/",authGuard, getOrderItems);
 router.get("/:id",authGuard, getOrderItemById);
-router.put("/:id", authGuard,ownershipOrRole("admin") ,updateOrderItem);
-router.delete("/:id",authGuard,ownershipOrRole("admin") ,deleteOrderItem);
+router.put("/:id", authGuard,ownershipOrRole("admin","Customer") ,validate(order_itemsSchemaUpdate),updateOrderItem);
+router.delete("/:id",authGuard,ownershipOrRole("admin","Customer") ,deleteOrderItem);
 
-export default router;
+export {router as orderItemRouter}

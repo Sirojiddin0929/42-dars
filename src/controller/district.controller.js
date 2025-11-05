@@ -1,4 +1,4 @@
-import { Customer } from "../models/customer.model.js";
+
 import { District } from "../models/district.model.js";
 
 export const createDistrict = async (req, res, next) => {
@@ -13,13 +13,13 @@ export const createDistrict = async (req, res, next) => {
 
 export const getDistricts = async (req, res, next) => {
   try {
-    const page=parseInt(req.quary.page) || 1
-    const limit = parseInt(req.quary.limit) || 10
+    const page=parseInt(req.query.page) || 1
+    const limit = parseInt(req.query.limit) || 10
     const search= req.query.search || ''
     const offset=(page-1)*limit
     const areas=Object.keys(District.schema.paths).filter((i)=> !['_id','__v','createdAt','updatedAt'].includes(i))
     const query=search?{$or:areas.map((i)=>({[i]:{$regex:search,$options:'i'}}))}:{}
-    const [data,total]= await Promise.all([Customer.find(query).skip(offset).limit(limit).sort({createdAt:-1}),Customer.countDocuments(query)])
+    const [data,total]= await Promise.all([District.find(query).skip(offset).limit(limit).sort({createdAt:-1}),District.countDocuments(query)])
     return res.status(200).json({message: 'OK',data,total,page,limit})
   } catch (err) {
     next(err);

@@ -9,13 +9,14 @@ import {
   updateWaterProduct,
   deleteWaterProduct
 } from "../controller/waterProduct.controller.js";
-
+import { validate } from "../middleware/validate.middleware.js";
+import { waterProschema,waterProschemaUpdate } from "../validation/waterProduct.validation.js";
 const router = express.Router();
 
-router.post("/",authGuard,ownershipOrRole("admin"), createWaterProduct);
+router.post("/",authGuard,ownershipOrRole("admin"),validate(waterProschema), createWaterProduct);
 router.get("/", authGuard,getWaterProducts);
 router.get("/:id",authGuard, getWaterProductById);
-router.put("/:id",authGuard,ownershipOrRole("admin"), updateWaterProduct);
+router.put("/:id",authGuard,ownershipOrRole("admin"), validate(waterProschemaUpdate),updateWaterProduct);
 router.delete("/:id", authGuard,ownershipOrRole("admin"),deleteWaterProduct);
 
-export default router;
+export {router as waterProductRouter}

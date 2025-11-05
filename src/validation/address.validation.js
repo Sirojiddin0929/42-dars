@@ -9,7 +9,7 @@ export const addressschema = Joi.object({
 });
 
 export const addresschemaUpdate = Joi.object({
-    name: Joi.string().min(2).max(20).optional(),
+    name: Joi.string().min(2).max(20).optional().trim(),
     address: Joi.string().min(6).max(25).optional(),
     location: Joi.string().min(4).max(15).optional(),
     customer_id: Joi.string().optional(),

@@ -1,14 +1,42 @@
-import express from "express";
-import { register, login, refresh, logout } from "../controller/auth.controller.js";
-import { validate } from "../validation/index.js";
-import { registerSchema, loginSchema, refreshSchema } from "../validation/auth.validation.js";
-import { authGuard } from "../middleware/authGuard.js";
+import { Router } from 'express';
+import { validate } from '../middleware/validate.middleware.js';
+import { loginValidate } from '../validation/auth.validation.js';
+import {login} from "../controller/auth.controller.js"
+import { verifyValidate } from '../validation/auth.validation.js';
+import { registerValidate} from '../validation/auth.validation.js';
+import { register} from '../controller/auth.controller.js';
+import { profile,refreshAccess } from '../controller/auth.controller.js';
+import { authGuard } from '../middleware/authGuard.js';
+import { verifyOtp } from '../controller/auth.controller.js';
 
-const router = express.Router();
 
-router.post("/register", validate(registerSchema), register);
-router.post("/login", validate(loginSchema), login);
-router.post("/refresh", validate(refreshSchema), refresh);
-router.post("/logout", authGuard, logout);
+const loginRouter = Router();
+loginRouter .post('/', validate(loginValidate), login);
 
-export default router;
+
+const registerRouter = Router();
+registerRouter .post('/', validate(registerValidate), register);
+
+
+
+const profileRouter = Router();
+profileRouter.get('/', authGuard, profile);
+
+
+
+const refreshRouter = Router()
+refreshRouter.post('/', refreshAccess );
+const verifyRouter=Router()
+verifyRouter.post("/", validate(verifyValidate), verifyOtp);
+
+
+const AuthRouter=Router()
+
+AuthRouter.use("/register",registerRouter)
+AuthRouter.use("/login",loginRouter)
+AuthRouter.use("/profile",profileRouter)
+AuthRouter.use("/refresh",refreshRouter)
+AuthRouter.use("/verify",verifyRouter)
+
+
+export default AuthRouter

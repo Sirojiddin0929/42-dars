@@ -18,6 +18,9 @@ export const getAddresses = async (req, res, next) => {
     const offset = (page-1)*limit
     const areas = Object.keys(Address.schema.paths).filter((i) => !['_id', '__v', 'createdAt', 'updatedAt'].includes(i))
     const query = search?{$or: areas.map((i) => ({[i]: { $regex: search, $options: 'i' },})),}: {}
+    if (req.user.role === 'customer') {
+        query.customer_id = req.user.id;
+    }
     const [data, total] = await Promise.all([Address.find(query).skip(offset).limit(limit).sort({ createdAt: -1 }),Address.countDocuments(query),]);
     return res.status(200).json({message:"OK",data,total,page,limit})
   } catch (err) {
@@ -28,7 +31,7 @@ export const getAddresses = async (req, res, next) => {
 export const getAddressById = async (req, res, next) => {
   try {
     const {id}=req.params
-    const address = await Address.findById(id)
+    const address = await Address.findById({ _id: id, customer_id: req.user.id })
     if (!address) return res.status(404).json({ message: "Address is not found" });
     return res.status(200).json(address);
   } catch (err) {
@@ -51,7 +54,7 @@ export const updateAddress = async (req, res, next) => {
 export const deleteAddress = async (req, res, next) => {
   try {
     const {id}=req.params
-    const address = await Address.findByIdAndDelete(id);
+    const address = await Address.findByIdAndDelete({ _id: id });
     if (!address) return res.status(404).json({ message: "Address not found" });
     return res.json({ message: "Address is  deleted",address });
   } catch (err) {
