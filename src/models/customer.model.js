@@ -1,13 +1,15 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
+
 const customerSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     phone: { type: String, required: true, unique: true },
     email:{type:String,required:true,unique:true},
     password:{type:String,required:true},
-    role:{type:String,enum:['Customer'],default:'Customer'}
+    role:{type:String,enum:['Customer'],default:'Customer'},
+    isActive:{type:Boolean,default:false}
   },
   { timestamps: true }
 );

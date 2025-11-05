@@ -28,7 +28,7 @@ export const getCustomers = async (req, res, next) => {
 export const getCustomerById = async (req, res, next) => {
   try {
     const {id}=req.params
-    const data = await Customer.findOne(id)
+    const data = await Customer.findOne({_id:id})
     if(!data){
        return res.status(404).json({message:`Customer is not found with such Id`})
     }

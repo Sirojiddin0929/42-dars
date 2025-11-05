@@ -13,7 +13,12 @@ export const authGuard = (req, res, next) => {
       const token = authHeader.split(" ")[1];
     
       const decoded=jwt.verify(token,process.env.JWT_ACCESS_SECRET)
-      req.user=decoded
+      req.user = {
+        id: decoded.id || decoded._id || decoded.userId,
+        role: decoded.role,
+        name: decoded.name,
+        email: decoded.email
+    };
       next()
     }catch(err) {
      return res.status(403).json({ message: "Token notogri yoki muddati tugagan", error: err.message });
